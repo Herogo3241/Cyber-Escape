@@ -1,0 +1,46 @@
+# Detect platform
+ifeq ($(OS),Windows_NT)
+    PLATFORM = Windows
+else
+    UNAME_S := $(shell uname -s)
+    ifeq ($(UNAME_S),Linux)
+        PLATFORM = Linux
+    else ifeq ($(UNAME_S),Darwin)
+        PLATFORM = macOS
+    endif
+endif
+
+# Compiler and source files
+CXX = g++
+SRC = main.cpp
+TARGET = main
+
+# Platform-specific settings
+ifeq ($(PLATFORM),Windows)
+    EXE = $(TARGET).exe
+    LIBS = -lraylib -lgdi32 -lwinmm
+    RUN_CMD = ./$(EXE)
+    CLEAN_CMD = del /F /Q $(EXE)
+else ifeq ($(PLATFORM),Linux)
+    EXE = $(TARGET)
+    LIBS = -lraylib -lm -ldl -lpthread -lGL -lX11
+    RUN_CMD = ./$(EXE)
+    CLEAN_CMD = rm -f $(EXE)
+else ifeq ($(PLATFORM),macOS)
+    EXE = $(TARGET)
+    LIBS = -lraylib -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo
+    RUN_CMD = ./$(EXE)
+    CLEAN_CMD = rm -f $(EXE)
+endif
+
+# Rules
+.PHONY: build run clean
+
+build:
+	$(CXX) -o $(EXE) $(SRC) $(LIBS)
+
+run: build
+	$(RUN_CMD)
+
+clean:
+	$(CLEAN_CMD)
