@@ -14,6 +14,7 @@ endif
 CXX = g++
 SRC = main.cpp
 TARGET = main
+MYLIBS = src/MyRay.cpp src/Enemy.cpp 
 
 # Platform-specific settings
 ifeq ($(PLATFORM),Windows)
@@ -34,13 +35,16 @@ else ifeq ($(PLATFORM),macOS)
 endif
 
 # Rules
-.PHONY: build run clean
+.PHONY: build run clean release
 
 build:
-	$(CXX) -o $(EXE) $(SRC) $(LIBS)
+	$(CXX) -o $(EXE) $(SRC) $(MYLIBS) $(LIBS)
 
 run: build
 	$(RUN_CMD)
 
 clean:
 	$(CLEAN_CMD)
+
+release:
+	$(CXX) -o game $(SRC) $(LIBS) -O3
