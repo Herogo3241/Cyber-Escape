@@ -30,7 +30,7 @@ void MyRay::draw()
     Vector2 direction = {cos(radAngle), sin(radAngle)};
     
     // Number of segments to divide the ray into
-    int segments = 5;
+    int segments = 15;
     float segmentLength = this->length / segments;
 
     for (int i = 0; i < segments; i++)

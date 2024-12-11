@@ -7,7 +7,8 @@ private:
     Vector2 pos;
     float angle;
     Vector2 movement;
-    float movementSpeed = 50.f;
+    float movementSpeed;
+    float swayRange;
     bool isMovingVertically;
 public:
     Enemy(Vector2 pos, bool isMovingVertically);

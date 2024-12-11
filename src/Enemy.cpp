@@ -4,8 +4,10 @@ Enemy::Enemy(Vector2 pos, bool isMovingVertically)
     : ray(pos, 0.f), isMovingVertically(isMovingVertically) {
     this->pos = pos;
     this->angle = 0.f;
+    this->movementSpeed = (float)(GetRandomValue(50, 100)); 
+    this->swayRange = (float)(GetRandomValue(30, 75));
 
-    // Initialize movement based on the specified direction
+
     if (this->isMovingVertically) {
         this->movement = {0, 1}; // Initially moves down
     } else {
@@ -13,22 +15,24 @@ Enemy::Enemy(Vector2 pos, bool isMovingVertically)
     }
 }
 
-void Enemy::update(float deltaTime) {
-    // Define smoothing parameters for rotation
-    float rotationSmoothing = 5.0f; // Higher values make rotation slower
 
-    // Check for boundary conditions and reverse direction
+
+void Enemy::update(float deltaTime) {
+ 
+    float rotationSmoothing = 5.0f; 
+
+    // Bounce off the screen edges
     if (this->isMovingVertically) {
         if (this->pos.y < 50 || this->pos.y > GetScreenHeight() - 50) {
-            this->movement.y *= -1; // Reverse vertical direction
+            this->movement.y *= -1; 
         }
     } else {
         if (this->pos.x < 50 || this->pos.x > GetScreenWidth() - 50) {
-            this->movement.x *= -1; // Reverse horizontal direction
+            this->movement.x *= -1; 
         }
     }
 
-    // Calculate target angle based on movement direction
+
     float targetAngle;
     if (this->isMovingVertically) {
         targetAngle = this->movement.y > 0 ? 90.f : -90.f; // Looking left-right
@@ -36,16 +40,16 @@ void Enemy::update(float deltaTime) {
         targetAngle = this->movement.x > 0 ? 0.f : 180.f; // Looking up-down
     }
 
-    // Smoothly interpolate current angle toward the target angle
+  
     this->angle += (targetAngle - this->angle) * deltaTime * rotationSmoothing;
 
-    // Update position based on movement vector
+ 
     this->pos.x += this->movement.x * this->movementSpeed * deltaTime;
     this->pos.y += this->movement.y * this->movementSpeed * deltaTime;
 
-    // Add swaying effect to the rays
-    float swayRange = 75.0f; // Max sway angle in degrees
-    float swaySpeed = 2.0f;  // Speed of sway (adjust as needed)
+  
+    float swayRange = this->swayRange; 
+    float swaySpeed = 2.0f;  
     float swayOffset = swayRange * sin(GetTime() * swaySpeed);
 
     // Cast rays with swaying effect
