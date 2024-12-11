@@ -6,8 +6,11 @@ private:
     MyRay ray;
     Vector2 pos;
     float angle;
+    Vector2 movement;
+    float movementSpeed = 50.f;
+    bool isMovingVertically;
 public:
-    Enemy(Vector2 pos);
+    Enemy(Vector2 pos, bool isMovingVertically);
     void update(float deltaTime);
     void draw();
     ~Enemy();

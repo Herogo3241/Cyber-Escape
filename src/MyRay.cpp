@@ -17,6 +17,11 @@ void MyRay::setAngle(float angle)
     this->angle = angle;
 }
 
+void MyRay::setLength(float length)
+{
+    this->length = length;
+}   
+
 void MyRay::draw()
 {
     float radAngle = this->angle * DEG2RAD;
@@ -25,7 +30,7 @@ void MyRay::draw()
     Vector2 direction = {cos(radAngle), sin(radAngle)};
     
     // Number of segments to divide the ray into
-    int segments = 100;
+    int segments = 5;
     float segmentLength = this->length / segments;
 
     for (int i = 0; i < segments; i++)
@@ -42,7 +47,7 @@ void MyRay::draw()
 
         // Adjust alpha based on the distance (further segments are more transparent)
         int alpha = 255 - (255 * i / segments); // Linearly decrease alpha
-        Color segmentColor = {255, 100, 0, (unsigned char)alpha}; // Red color with variable alpha
+        Color segmentColor = {253, 249, 0, (unsigned char)alpha}; // Red color with variable alpha
 
         DrawLineV(start, end, segmentColor);
     }
