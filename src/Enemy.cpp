@@ -49,7 +49,7 @@ void Enemy::update(float deltaTime) {
 
   
     float swayRange = this->swayRange; 
-    float swaySpeed = 2.0f;  
+    float swaySpeed = 1.5f;  
     float swayOffset = swayRange * sin(GetTime() * swaySpeed);
 
     // Cast rays with swaying effect
@@ -63,9 +63,10 @@ void Enemy::update(float deltaTime) {
 
 
 void Enemy::draw() {
-    // Draw the enemy as a red circle
     DrawCircle(this->pos.x, this->pos.y, 10, RED);
 }
+
+
 
 Enemy::~Enemy() {
     // Clean up resources if necessary

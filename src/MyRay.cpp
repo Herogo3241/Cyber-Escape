@@ -46,7 +46,7 @@ void MyRay::draw()
         };
 
         // Adjust alpha based on the distance (further segments are more transparent)
-        int alpha = 255 - (255 * i / segments); // Linearly decrease alpha
+        int alpha = 200 - (200 * i / segments); // Linearly decrease alpha
         Color segmentColor = {253, 249, 0, (unsigned char)alpha}; // Red color with variable alpha
 
         DrawLineV(start, end, segmentColor);

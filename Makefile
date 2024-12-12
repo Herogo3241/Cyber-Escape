@@ -14,7 +14,7 @@ endif
 CXX = g++
 SRC = main.cpp
 TARGET = main
-MYLIBS = src/MyRay.cpp src/Enemy.cpp src/Player.cpp
+MYLIBS = src/MyRay.cpp src/Enemy.cpp src/Player.cpp src/Monitor.cpp
 
 # Platform-specific settings
 ifeq ($(PLATFORM),Windows)
