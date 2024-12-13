@@ -1,6 +1,7 @@
 #include "raylib.h"
 #include <string>
 #include <vector>
+#include "MatrixEffect.h"
 
 class Monitor
 {
@@ -21,12 +22,19 @@ private:
     float screenTime;
     float screenIntensity;
     Color GetScanLineColor(float y);
+    float backspaceTimer = 0.0f;
+    const float BACKSPACE_DELAY = 0.1f;
+    MatrixEffect mxEffect;
+    bool toggleMatrixEffect = false;
+    float closeTimer;
+
 
 public:
     Monitor(std::string Title, Vector2 pos);
     void draw();
     void update(float deltaTime);
     int processCommand();
+    
     void toggleOpen();
     void toggleClose();
     ~Monitor();

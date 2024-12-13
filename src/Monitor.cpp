@@ -5,8 +5,10 @@
 #include <sstream>
 #include <iostream>
 #include <math.h>
+#include <random>
 
-Monitor::Monitor(std::string Title, Vector2 pos)
+
+Monitor::Monitor(std::string Title, Vector2 pos) : mxEffect({pos.x - 440, pos.y - 300}, 600, 900, 0.1f)
 {
     this->Title = Title;
     this->pos = pos;
@@ -17,12 +19,17 @@ Monitor::Monitor(std::string Title, Vector2 pos)
     this->currentInput = "";
     this->textY = this->rec.y + 20;
     this->font = LoadFont("./assets/terminal.ttf");
-    this->IBMfont = LoadFont("./assets/IBM-Bold.ttf");  
+    this->IBMfont = LoadFont("./assets/IBM-Bold.ttf");
 
     // Initialize screen effect
     this->scanLineOffset = 0.0f;
     this->screenTime = 0.0f;
     this->screenIntensity = 1.0f;
+    commandHistory.push_back("Type \'help\' to show commands");
+    this->closeTimer = 0.0f;
+
+    
+    
 }
 
 Color Monitor::GetScanLineColor(float y)
@@ -44,7 +51,7 @@ Color Monitor::GetScanLineColor(float y)
 
 void Monitor::toggleOpen()
 {
-    this->isOpen = true; 
+    this->isOpen = true;
 }
 
 void Monitor::toggleClose()
@@ -52,6 +59,8 @@ void Monitor::toggleClose()
     this->isOpen = false;
     currentInput.clear();
 }
+
+
 
 int Monitor::processCommand()
 {
@@ -74,6 +83,10 @@ int Monitor::processCommand()
         commandHistory.clear();
         isOpen = false;
         n = 0;
+    }
+    else if (currentInput == "open"){
+        commandHistory.clear();
+        toggleMatrixEffect = true;      
     }
     else if (currentInput.rfind("chmod", 0) == 0)
     {
@@ -118,8 +131,22 @@ void Monitor::update(float deltaTime)
     if (!isOpen)
         return;
 
+
+    if(toggleMatrixEffect) {
+        
+        closeTimer += deltaTime;
+        mxEffect.update();
+    }
+
+    if(closeTimer > 10.0f){
+        toggleMatrixEffect = false;
+        toggleClose();
+        closeTimer = 0.0f;
+    }
+        
+
     screenTime += deltaTime;
-    scanLineOffset += deltaTime * 12.5f;
+    scanLineOffset += deltaTime * 100.f;
 
     // Random screen distortion
     if (GetRandomValue(0, 100) < 2)
@@ -156,9 +183,18 @@ void Monitor::update(float deltaTime)
     }
 
     // Rest of the update logic remains the same
-    if (IsKeyPressed(KEY_BACKSPACE) && !currentInput.empty())
+    if (IsKeyDown(KEY_BACKSPACE) && !currentInput.empty())
     {
-        currentInput.pop_back();
+        backspaceTimer += deltaTime;
+        if (backspaceTimer >= BACKSPACE_DELAY)
+        {
+            currentInput.pop_back();
+            backspaceTimer = 0.0f;
+        }
+    }
+    else
+    {
+        backspaceTimer = BACKSPACE_DELAY; // Reset timer when key is released
     }
 
     int key = GetCharPressed();
@@ -181,72 +217,214 @@ void Monitor::update(float deltaTime)
 
 void Monitor::draw()
 {
-    if (!isOpen){
+    if (!isOpen)
         return;
+
+    const float time = GetTime();
+    // Constants for monitor design
+    const float BEZEL_THICKNESS = 50.0f;  // Increased thickness for chunky retro look
+    const float SCREEN_INSET = 25.0f;
+    const Color MAIN_COLOR = {40, 45, 55, 255};  // Dark metallic base
+    const Color ACCENT_COLOR = {0, 255, 200, 255};  // Cyan accent
+    const Color DARK_ACCENT = {0, 100, 80, 255};  // Darker cyan
+    const Color SCREEN_COLOR = {10, 12, 15, 255};  // Darker screen
+    
+    // Monitor outer casing
+    Rectangle outerCase = {
+        pos.x - 480 - BEZEL_THICKNESS,
+        pos.y - 360 - BEZEL_THICKNESS,
+        960.0f + (BEZEL_THICKNESS * 2),
+        720.0f + (BEZEL_THICKNESS * 2)
+    };
+
+    // Draw main monitor body with metallic effect
+    DrawRectangleRec(outerCase, MAIN_COLOR);
+    
+    // Draw decorative angular cuts in corners
+    const float CORNER_SIZE = 40.0f;
+    const float ANGLE_SIZE = 20.0f;
+    
+    // Top left corner
+    DrawTriangle(
+        (Vector2){outerCase.x, outerCase.y},
+        (Vector2){outerCase.x + CORNER_SIZE, outerCase.y},
+        (Vector2){outerCase.x, outerCase.y + CORNER_SIZE},
+        DARK_ACCENT
+    );
+    
+    // Top right corner
+    DrawTriangle(
+        (Vector2){outerCase.x + outerCase.width, outerCase.y},
+        (Vector2){outerCase.x + outerCase.width - CORNER_SIZE, outerCase.y},
+        (Vector2){outerCase.x + outerCase.width, outerCase.y + CORNER_SIZE},
+        DARK_ACCENT
+    );
+
+    // Draw glowing accent lines
+    float glowIntensity = (sinf(time * 2.0f) + 1.0f) * 0.5f;
+    Color glowColor = {
+        ACCENT_COLOR.r,
+        ACCENT_COLOR.g,
+        ACCENT_COLOR.b,
+        (unsigned char)(ACCENT_COLOR.a * glowIntensity)
+    };
+
+    // Horizontal accent lines
+    for (int i = 0; i < 3; i++) {
+        float lineY = outerCase.y + 10.0f + (i * 5.0f);
+        DrawLineEx(
+            (Vector2){outerCase.x + CORNER_SIZE, lineY},
+            (Vector2){outerCase.x + outerCase.width - CORNER_SIZE, lineY},
+            2,
+            glowColor
+        );
     }
+
+    Rectangle screenArea = {
+        pos.x - 480 + SCREEN_INSET,
+        pos.y - 360 + SCREEN_INSET,
+        960.0f - (SCREEN_INSET * 2),
+        720.0f - (SCREEN_INSET * 2)
+    };
+    DrawRectangleRec(screenArea, SCREEN_COLOR);
+
+    // Draw tech pattern border
+    const int SEGMENTS = 20;
+    for (int i = 0; i < SEGMENTS; i++) {
+        float segmentLength = screenArea.width / SEGMENTS;
+        float x = screenArea.x + (i * segmentLength);
+        float alpha = (sinf(time * 3.0f + i * 0.5f) + 1.0f) * 0.5f;
         
-
-    
-
-    // Draw the monitor background with scan lines
-    Rectangle monitor = {pos.x - 480, pos.y - 360, 960.0f, 720.0f};
-    DrawRectangleRec(monitor, {192,184,155, 255});
-    DrawRectangleRec(this->rec, {0, 0, 0, 255});
-
-                              // You can load a custom font if needed
-    Vector2 textPosition = {(float) GetScreenWidth() / 2 - 20, monitor.y + 10}; // Position for the brand name
-
-    // Draw the brand name "IVM" on the monitor
-    DrawTextEx(IBMfont, "IVM", textPosition, 40, 2, {0, 0, 0, 255});
-
-    
-    // Draw scan lines
-    for (float y = this->rec.y; y < this->rec.y + this->rec.height; y += 2.0f)
-    {
-        DrawLine(
-            this->rec.x, y,
-            this->rec.x + this->rec.width, y,
-            {0, 20, 0, 50});
+        DrawRectangle(x, screenArea.y - 5, segmentLength * 0.8f, 3,
+                     Fade(ACCENT_COLOR, alpha * 0.7f));
+        DrawRectangle(x, screenArea.y + screenArea.height + 2, segmentLength * 0.8f, 3,
+                     Fade(ACCENT_COLOR, alpha * 0.7f));
     }
 
-    // Draw monitor border
-    DrawRectangleLinesEx(this->rec, 3, {49,53,63,255});
+    // Draw inset screen border with glowing effect
+    DrawRectangleLinesEx(screenArea, 2, DARK_ACCENT);
+    DrawRectangleLinesEx(
+        (Rectangle){screenArea.x - 2, screenArea.y - 2,
+                   screenArea.width + 4, screenArea.height + 4},
+        1,
+        Fade(ACCENT_COLOR, glowIntensity * 0.5f)
+    );
 
-    // Draw the title text
-    float titleY = this->rec.y + 20;
-    DrawTextEx(font, this->Title.c_str(), {this->rec.x + 20, titleY},
-               20, 0, GetScanLineColor(titleY));
+    // Draw futuristic logo area
+    Rectangle logoArea = {
+        screenArea.x + (screenArea.width / 2) - 70,
+        screenArea.y - 40,
+        140,
+        35
+    };
+    DrawRectangleRec(logoArea, MAIN_COLOR);
+    
+    // Animated chevrons around logo
+    const float CHEVRON_SIZE = 10.0f;
+    for (int i = 0; i < 3; i++) {
+        float xOffset = sinf(time * 2.0f + i * 1.0f) * 5.0f;
+        DrawTriangle(
+            (Vector2){logoArea.x - 20.0f - (i * 15.0f) + xOffset, logoArea.y + logoArea.height/2},
+            (Vector2){logoArea.x - 10.0f - (i * 15.0f) + xOffset, logoArea.y},
+            (Vector2){logoArea.x - 10.0f - (i * 15.0f) + xOffset, logoArea.y + logoArea.height},
+            Fade(ACCENT_COLOR, 0.5f - (i * 0.1f))
+        );
+    }
+
+    // Draw IVM logo with tech effect
+    Vector2 logoPos = {logoArea.x + 35, logoArea.y - 5};
+    DrawTextEx(IBMfont, "IVM", logoPos, 40, 2, ACCENT_COLOR);
+    DrawTextEx(IBMfont, "IVM", (Vector2){logoPos.x + 1, logoPos.y + 1}, 40, 2, 
+               Fade(DARK_ACCENT, glowIntensity));
+
+    // Draw power LED with pulse effect
+    float ledSize = 5.0f + sinf(time * 4.0f) * 1.0f;
+    DrawCircle(screenArea.x + screenArea.width - 30,
+               screenArea.y - 20,
+               ledSize,
+               Fade(ACCENT_COLOR, 0.7f));
+    DrawCircle(screenArea.x + screenArea.width - 30,
+               screenArea.y - 20,
+               ledSize * 0.6f,
+               ACCENT_COLOR);
+
+    // Enhanced scan lines with CRT effect
+    for (float y = screenArea.y; y < screenArea.y + screenArea.height; y += 2.0f) {
+        float scanIntensity = (sinf(y * 0.1f + screenTime * 2.0f) + 1.0f) * 0.5f;
+        float distortionOffset = sinf(y * 0.02f + time) * 2.0f;
+        DrawLine(
+            screenArea.x + distortionOffset,
+            y,
+            screenArea.x + screenArea.width + distortionOffset,
+            y,
+            (Color){ACCENT_COLOR.r, ACCENT_COLOR.g, ACCENT_COLOR.b, 
+                    (unsigned char)(scanIntensity * 40.0f)}
+        );
+    }
+
+    // Draw terminal content
+    float currentY = screenArea.y + 40;
+    const float lineHeight = 20.0f;
+
+    // Draw title with glitch effect
+    std::string titleText = Title;
+    if (fmodf(time * 10.0f, 1.0f) < 0.05f) {
+        // Occasional glitch effect
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dis(0, titleText.length() - 1);
+        titleText[dis(gen)] = char(33 + dis(gen) % 94);
+    }
+    DrawTextEx(font, titleText.c_str(),
+               (Vector2){screenArea.x + 20, screenArea.y + 20},
+               20, 0, GetScanLineColor(currentY));
 
     // Draw command history
-    float currentY = this->rec.y + 50;
-    const float lineHeight = 20.0f;
-    const float maxY = this->rec.y + this->rec.height - 40;
+    currentY += 30;
+    for (const auto &command : commandHistory) {
+        if (currentY >= screenArea.y + screenArea.height - 40)
+            break;
 
-    for (const auto &command : commandHistory)
-    {
-        if (currentY >= maxY)
-        {
-            commandHistory.erase(commandHistory.begin());
-            continue;
-        }
-        float leftSpace = 10.f;
-        if (command[0] != '$')
-            leftSpace = 10.f;
+        float leftSpace = command[0] == '$' ? 10.0f : 10.0f;
         DrawTextEx(font, command.c_str(),
-                   {this->rec.x + leftSpace, currentY},
+                   (Vector2){screenArea.x + leftSpace, currentY},
                    16, 0, GetScanLineColor(currentY));
-        currentY += lineHeight + 5;
+        currentY += lineHeight;
     }
 
-    // Draw the current input at the bottom
-    float inputY = this->rec.y + this->rec.height - 30;
-    std::string displayInput = "$ " + currentInput + (cursorVisible ? "|" : " ");
+    if(toggleMatrixEffect) {
+        mxEffect.draw();
+    }
+
+    // Draw current input line with pulsing cursor
+    float inputY = screenArea.y + screenArea.height - 30;
+    std::string displayInput = "$ " + currentInput + 
+        (cursorVisible ? "|" : " ");
     DrawTextEx(font, displayInput.c_str(),
-               {this->rec.x + 20, inputY},
+               (Vector2){screenArea.x + 20, inputY},
                16, 0, GetScanLineColor(inputY));
+
+    // Enhanced vignette effect
+    float vignetteSize = 250.0f;
+    for (int i = 0; i < vignetteSize; i++) {
+        float alpha = (i / vignetteSize) * 150;
+        float distortion = sinf(time + i * 0.1f) * 2.0f;
+        DrawRectangleLinesEx(
+            (Rectangle){
+                screenArea.x - i/2 + distortion,
+                screenArea.y - i/2,
+                screenArea.width + i,
+                screenArea.height + i
+            },
+            1,
+            (Color){0, 0, 0, (unsigned char)(150 - alpha)}
+        );
+    }
 }
+
 Monitor::~Monitor()
 {
     UnloadFont(font);
     UnloadFont(IBMfont);
+    
 }
