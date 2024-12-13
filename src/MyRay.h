@@ -7,7 +7,7 @@ private:
     /* data */
     Vector2 pos;
     float angle;
-    float length = 75.f;
+    float length = 100.f;
 public:
     MyRay(Vector2 pos, float angle);
     void setPos(Vector2 pos);

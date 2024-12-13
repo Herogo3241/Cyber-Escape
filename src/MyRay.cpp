@@ -46,8 +46,8 @@ void MyRay::draw()
         };
 
   
-        int alpha = 100 - (100 * i / segments); 
-        Color segmentColor = {253, 249, 0, (unsigned char)alpha}; 
+        int alpha = 255 - (255 * i / segments); 
+        Color segmentColor = {255, 0, 0, (unsigned char)alpha}; 
 
         DrawLine(start.x, start.y, end.x, end.y, segmentColor);
     }

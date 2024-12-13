@@ -65,11 +65,11 @@ void Board::draw() {
             float alpha = 0.7f + sinf(time * 2 + i * j * 0.1f) * 0.3f; // Pulsing effect
 
             switch (boardData[i][j]) {
-            case 0: // Path tiles
+            case 1: // Path tiles
                 baseColor = (Color){80, 90, 120, 255};    // Steel blue-gray
                 glowColor = (Color){100, 150, 255, 100};  // Neon blue glow
                 break;
-            case 1: // Ground/Metal tiles
+            case 0: // Ground/Metal tiles
                 baseColor = (Color){64, 64, 92, 255};     // Dark metallic
                 glowColor = (Color){128, 128, 155, 100};  // Metal glow
                 break;
