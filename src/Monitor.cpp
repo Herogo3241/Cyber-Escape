@@ -126,10 +126,10 @@ int Monitor::processCommand()
     return n;
 }
 
-void Monitor::update(float deltaTime)
+bool Monitor::update(float deltaTime)
 {
     if (!isOpen)
-        return;
+        return false;
 
 
     if(toggleMatrixEffect) {
@@ -141,6 +141,7 @@ void Monitor::update(float deltaTime)
     if(closeTimer > 10.0f){
         toggleMatrixEffect = false;
         toggleClose();
+        this->isCompleted = true;
         closeTimer = 0.0f;
     }
         
@@ -179,7 +180,7 @@ void Monitor::update(float deltaTime)
 
         // Reset textY to accommodate visible history
         textY = this->rec.y + 50; // Start below title
-        return;
+        return false;
     }
 
     // Rest of the update logic remains the same
@@ -213,6 +214,9 @@ void Monitor::update(float deltaTime)
         cursorVisible = !cursorVisible;
         timeSinceLastBlink = 0.0f;
     }
+
+
+    return this->isCompleted;
 }
 
 void Monitor::draw()

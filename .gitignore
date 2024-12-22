@@ -2,3 +2,4 @@
 .obsidian
 *.exe
 main
+.gitignore

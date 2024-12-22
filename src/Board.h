@@ -1,3 +1,6 @@
+#ifndef BOARD_H
+#define BOARD_H
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -23,3 +26,5 @@ private:
     void loadBoard();
     
 };
+
+#endif

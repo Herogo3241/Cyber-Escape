@@ -1,20 +1,31 @@
-#include "MyRay.h"
+#ifndef ENEMY_H
+#define ENEMY_H
+
 #include "raylib.h"
-class Enemy
-{
+#include "MyRay.h"
+#include <vector>
+
+class Enemy {
 private:
-    MyRay ray;
     Vector2 pos;
     float angle;
     Vector2 movement;
     float movementSpeed;
     float swayRange;
     bool isMovingVertically;
+    MyRay ray;
     const std::vector<std::vector<int>>* boardData;
+    float detectionRadius;
+    float trackingDuration;
+    float maxTrackingTime;
+    bool isTrackingPlayer;
+    float fullRotationTimer;
+
 public:
     Enemy(Vector2 pos, bool isMovingVertically, const std::vector<std::vector<int>>& boardData);
-    void update(float deltaTime);
+    bool update(float deltaTime, Vector2 playerPos);  // Removed Enemy:: qualification
     void draw();
     ~Enemy();
 };
 
+#endif

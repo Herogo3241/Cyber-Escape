@@ -65,7 +65,7 @@ void MyRay::draw() {
     float radAngle = this->angle * DEG2RAD;
     Vector2 direction = {cos(radAngle), sin(radAngle)};
     
-    int segments = 30;
+    int segments = 20;
     float segmentLength = this->length / segments;
     
     for (int i = 0; i < segments; i++) {
@@ -91,7 +91,7 @@ void MyRay::draw() {
     
     // Optionally, draw collision point
     if (hasCollided) {
-        DrawCircle(collisionPoint.x, collisionPoint.y, 3, RED);
+        DrawCircle(collisionPoint.x, collisionPoint.y, 2,  {255, 0, 0, 255 - 255 * 18/20});
     }
 }
 

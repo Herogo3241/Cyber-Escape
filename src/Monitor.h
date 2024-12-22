@@ -1,3 +1,6 @@
+#ifndef MONITOR_H
+#define MONITOR_H
+
 #include "raylib.h"
 #include <string>
 #include <vector>
@@ -30,12 +33,16 @@ private:
 
 
 public:
+    bool isCompleted = false;
     Monitor(std::string Title, Vector2 pos);
     void draw();
-    void update(float deltaTime);
+    bool update(float deltaTime);
     int processCommand();
     
     void toggleOpen();
     void toggleClose();
     ~Monitor();
 };
+
+
+#endif

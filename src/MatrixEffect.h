@@ -1,3 +1,7 @@
+#ifndef MATRIX_EFFECT_H
+#define MATRIX_EFFECT_H
+
+
 #include "raylib.h"
 #include <string>
 #include <vector>
@@ -23,3 +27,6 @@ public:
     void clear();
     ~MatrixEffect();
 };
+
+
+#endif
