@@ -29,9 +29,11 @@ private:
     
     // UI Elements
     Rectangle playButton;
+    Rectangle quitButton;     // New quit button
     Rectangle retryButton;
     Rectangle nextLevelButton;
     Rectangle returnToMenuButton;
+    Rectangle returnToMenuButton2;
     
     void drawStartScreen();
     void drawGameOverScreen();

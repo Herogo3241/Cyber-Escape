@@ -7,15 +7,17 @@ GameManager::GameManager(float width, float height)
     // Initialize buttons
     float buttonWidth = 200;
     float buttonHeight = 50;
+    float buttonSpacing = 70; // Space between buttons
     playButton = {WIDTH / 2 - buttonWidth / 2, HEIGHT / 2, buttonWidth, buttonHeight};
+    quitButton = {WIDTH / 2 - buttonWidth / 2, HEIGHT / 2 + buttonSpacing, buttonWidth, buttonHeight};
     retryButton = {WIDTH / 2 - buttonWidth / 2, HEIGHT / 2 + 100, buttonWidth, buttonHeight};
     nextLevelButton = {WIDTH / 2 - buttonWidth / 2, HEIGHT / 2, buttonWidth, buttonHeight};
     returnToMenuButton = {WIDTH / 2 - buttonWidth / 2, HEIGHT / 2 + 100, buttonWidth, buttonHeight};
+    returnToMenuButton2 = {WIDTH / 2 - buttonWidth / 2, HEIGHT / 2 + 100 + buttonSpacing, buttonWidth, buttonHeight};
 
     levels.push_back(new Level1(WIDTH, HEIGHT));
     levels.push_back(new Level2(WIDTH, HEIGHT));
     levels.push_back(new Level3(WIDTH, HEIGHT));
-
 }
 
 void GameManager::resetCurrentLevel() {
@@ -50,6 +52,13 @@ void GameManager::update(float deltaTime)
             currentLevelIndex = 0;
             resetCurrentLevel();
             setState(GameState::PLAYING);
+        }
+        else if (CheckCollisionPointRec(GetMousePosition(), quitButton) &&
+                 IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+        {
+            // Close the window and exit the game
+            CloseWindow();
+            exit(0);
         }
         break;
 
@@ -93,6 +102,11 @@ void GameManager::update(float deltaTime)
             resetCurrentLevel();
             setState(GameState::PLAYING);
         }
+        else if (CheckCollisionPointRec(GetMousePosition(), returnToMenuButton2) &&
+                 IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+        {
+            setState(GameState::START_SCREEN);
+        }
         break;
 
     case GameState::LEVEL_COMPLETE:
@@ -122,7 +136,6 @@ void GameManager::update(float deltaTime)
     }
 }
 
-
 void GameManager::drawStartScreen()
 {
     // Draw title with glowing effect
@@ -138,17 +151,27 @@ void GameManager::drawStartScreen()
     // Draw main text
     DrawText(title, WIDTH / 2 - titleWidth / 2, HEIGHT / 3, fontSize, CYBER_BLUE);
 
-    // Draw interactive button with hover effect
-    Color buttonColor = CheckCollisionPointRec(GetMousePosition(), playButton) ? CYBER_RED : CYBER_BLUE;
-
-    DrawRectangleLinesEx(playButton, 2, buttonColor);
+    // Draw START button with hover effect
+    Color playButtonColor = CheckCollisionPointRec(GetMousePosition(), playButton) ? CYBER_RED : CYBER_BLUE;
+    DrawRectangleLinesEx(playButton, 2, playButtonColor);
     const char *playText = "START MISSION";
     float playWidth = MeasureText(playText, 20);
     DrawText(playText,
              playButton.x + playButton.width / 2 - playWidth / 2,
              playButton.y + 15,
              20,
-             buttonColor);
+             playButtonColor);
+
+    // Draw QUIT button with hover effect
+    Color quitButtonColor = CheckCollisionPointRec(GetMousePosition(), quitButton) ? CYBER_RED : CYBER_BLUE;
+    DrawRectangleLinesEx(quitButton, 2, quitButtonColor);
+    const char *quitText = "QUIT";
+    float quitWidth = MeasureText(quitText, 20);
+    DrawText(quitText,
+             quitButton.x + quitButton.width / 2 - quitWidth / 2,
+             quitButton.y + 15,
+             20,
+             quitButtonColor);
 
     // Draw atmospheric effects
     for (int i = 0; i < 10; i++)
@@ -187,15 +210,27 @@ void GameManager::drawGameOverScreen()
              CYBER_RED);
 
     // Draw retry button
-    Color buttonColor = CheckCollisionPointRec(GetMousePosition(), retryButton) ? CYBER_BLUE : CYBER_RED;
-    DrawRectangleLinesEx(retryButton, 2, buttonColor);
+    Color RetrybuttonColor = CheckCollisionPointRec(GetMousePosition(), retryButton) ? CYBER_BLUE : CYBER_RED;
+    DrawRectangleLinesEx(retryButton, 2, RetrybuttonColor);
     const char *retryText = "REBOOT SYSTEM";
     float retryWidth = MeasureText(retryText, 20);
     DrawText(retryText,
              retryButton.x + retryButton.width / 2 - retryWidth / 2,
              retryButton.y + 15,
              20,
-             buttonColor);
+             RetrybuttonColor);
+
+
+    Color MenuButtonColor = CheckCollisionPointRec(GetMousePosition(), returnToMenuButton2) ? CYBER_RED : CYBER_BLUE;
+    DrawRectangleLinesEx(returnToMenuButton2, 2, MenuButtonColor);
+    const char *menuText = "Back To Base";
+    float menuWidth = MeasureText(menuText, 20);
+    DrawText(menuText,
+             returnToMenuButton2.x + returnToMenuButton2.width / 2 - menuWidth / 2,
+             returnToMenuButton2.y + 15,
+             20,
+             MenuButtonColor);
+
 }
 
 void GameManager::drawLevelCompleteScreen()

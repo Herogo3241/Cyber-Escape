@@ -13,13 +13,13 @@ endif
 # Compiler and source files
 CXX = g++
 SRC = src/main.cpp
-TARGET = main
+TARGET = cyber_escape
 MYLIBS = src/MyRay.cpp src/Enemy.cpp src/Player.cpp src/Monitor.cpp src/MatrixEffect.cpp src/Board.cpp src/levels/level1.cpp src/levels/level2.cpp src/levels/level3.cpp src/levels/Level.cpp src/GameManager.cpp 
 
 # Platform-specific settings
 ifeq ($(PLATFORM),Windows)
     EXE = $(TARGET).exe
-    LIBS = -lraylib -lgdi32 -lwinmm
+    LIBS = -lraylib -lgdi32 -lwinmm -mwindows
     RUN_CMD = ./$(EXE)
     CLEAN_CMD = del /F /Q $(EXE)
 else ifeq ($(PLATFORM),Linux)
