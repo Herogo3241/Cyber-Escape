@@ -5,7 +5,6 @@
 #include "raylib.h"
 class Board {
 private:
-    std::vector<std::vector<int>> boardData; 
     int width;        
     int height;
     int cols;
@@ -13,7 +12,9 @@ private:
     std::ifstream& file;    
 
 public:
+    std::vector<std::vector<int>> boardData; 
     Board(std::ifstream& file);  
+    const std::vector<std::vector<int>>& getBoardData() const { return boardData; }
     void draw(); 
     ~Board();                   
      

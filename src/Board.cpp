@@ -44,6 +44,8 @@ void Board::loadBoard() {
     cols = boardData.empty() ? 0 : boardData[0].size();
 }
 
+
+
 void Board::draw() {
     const int tileSize = 64;
     const float time = GetTime(); 
@@ -94,13 +96,15 @@ void Board::draw() {
                          Fade(glowColor, 0.3f));
 
             // Draw scanline effect
-            float scanlinePos = fmodf(time * 100, GetScreenHeight());
-            if (abs(i * tileSize - scanlinePos) < tileSize) {
-                DrawRectangle(j * tileSize, i * tileSize, tileSize, 2,
-                             Fade(WHITE, 0.1f));
-            }
+            // float scanlinePos = fmodf(time * 100, GetScreenHeight());
+            // if (abs(i * tileSize - scanlinePos) < tileSize) {
+            //     DrawRectangle(j * tileSize, i * tileSize, tileSize, 2,
+            //                  Fade(WHITE, 0.1f));
+            // }
         }
     }
+
+
 
     // Draw hexagonal grid overlay
     for (int i = 0; i < boardData.size(); i++) {

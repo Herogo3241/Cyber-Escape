@@ -52,20 +52,22 @@ int main()
     Monitor level1mon("$$ Level 1 $$", {WIDTH / 2, HEIGHT / 2});
 
     // Enemies creation
-    int count = 2;
+    int count = 6;
     std::vector<Enemy> enemies;
     for (int i = 0; i < count; i++)
     {
         enemies.emplace_back(Vector2{(float)GetRandomValue(50, WIDTH - 50),
                                      (float)GetRandomValue(50, HEIGHT - 50)},
-                             GetRandomValue(0, 1));
+                             GetRandomValue(0, 1), board.boardData);
     }
 
     bool isFullscreen = true;
 
     while (!WindowShouldClose())
     {
-
+        BeginDrawing();
+        ClearBackground(BLACK);
+        board.draw();
         player.update(GetFrameTime());
         for (auto &enemy : enemies)
         {
@@ -78,9 +80,9 @@ int main()
             level1mon.toggleClose();
 
         level1mon.update(GetFrameTime());
-        BeginDrawing();
-        ClearBackground(BLACK);
-        board.draw();
+        
+        
+        
         for (auto &enemy : enemies)
         {
             enemy.draw();

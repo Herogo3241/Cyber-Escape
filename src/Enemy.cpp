@@ -1,12 +1,12 @@
 #include "Enemy.h"
 
-Enemy::Enemy(Vector2 pos, bool isMovingVertically)
+Enemy::Enemy(Vector2 pos, bool isMovingVertically, const std::vector<std::vector<int>>& boardData)
     : ray(pos, 0.f), isMovingVertically(isMovingVertically) {
     this->pos = pos;
     this->angle = 0.f;
-    this->movementSpeed = (float)(GetRandomValue(50, 100)); 
+    this->movementSpeed = (float)(GetRandomValue(50, 100));
     this->swayRange = (float)(GetRandomValue(30, 75));
-
+    this->boardData = &boardData;
 
     if (this->isMovingVertically) {
         this->movement = {0, 1}; // Initially moves down
@@ -56,7 +56,15 @@ void Enemy::update(float deltaTime) {
     for (float i = this->angle - 30 + swayOffset; i < this->angle + 30 + swayOffset; i += 0.5f) {
         this->ray.setPos(this->pos);
         this->ray.setAngle(i);
+        this->ray.setLength(200.0f); 
+        
+
+        if (boardData) {
+            this->ray.checkCollision(*boardData);
+        }
+
         this->ray.draw();
+        
     }
 }
 
@@ -65,7 +73,7 @@ void Enemy::draw() {
     const float time = GetTime();
     const Color CYBER_RED = {255, 30, 60, 255};
     const Color DARK_RED = {120, 0, 20, 255};
-    const float baseRadius = 10.0f;
+    const float baseRadius = 20.0f;
     
     // Draw threat indicator ring
     float warningRadius = baseRadius * 1.4f + sinf(time * 5.0f) * 2.0f;

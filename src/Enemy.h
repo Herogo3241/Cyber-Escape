@@ -10,8 +10,9 @@ private:
     float movementSpeed;
     float swayRange;
     bool isMovingVertically;
+    const std::vector<std::vector<int>>* boardData;
 public:
-    Enemy(Vector2 pos, bool isMovingVertically);
+    Enemy(Vector2 pos, bool isMovingVertically, const std::vector<std::vector<int>>& boardData);
     void update(float deltaTime);
     void draw();
     ~Enemy();
