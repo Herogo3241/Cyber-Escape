@@ -21,8 +21,7 @@ int main()
     float HEIGHT = GetMonitorHeight(monitor);
     float WIDTH = GetMonitorWidth(monitor);
 
-    // float HEIGHT = 600.f;
-    // float WIDTH = 800.f;
+
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
 

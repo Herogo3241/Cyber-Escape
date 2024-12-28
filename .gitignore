@@ -3,3 +3,5 @@
 *.exe
 main
 .gitignore
+*.zip
+web/
